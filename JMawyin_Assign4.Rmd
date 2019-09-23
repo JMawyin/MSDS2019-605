@@ -1,0 +1,148 @@
+---
+title: "605 - Homework 4"
+author: "Jose Mawyin"
+date: "9/16/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#ASSIGNMENT 4
+
+##DATA 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS - 2019
+
+###1. Problem Set 1
+In this problem, we’ll verify using R that SVD and Eigenvalues are related as worked
+out in the weekly module. Given a 3 × 2 matrix A:
+$$A=\left[ \begin{matrix} 1 & 2 & 3 \\ -1 & 0 & 4 \end{matrix} \right] $$
+
+
+
+Write code in R to compute $X=A{ A }^{ T }$ and $Y={ A }^{ T }A$ . Then, compute the eigenvalues and eigenvectors of X and Y using the built-in commans in R.
+Then, compute the left-singular, singular values, and right-singular vectors of A using the svd command. Examine the two sets of singular vectors and show that they are indeed eigenvectors of X and Y. In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both X and Y are the same and are squares of the non-zero singular values of A.
+Your code should compute all these vectors and scalars and store them in variables. Please add enough comments in your code to show me how to interpret your steps.
+
+```{r}
+##Calculation of Transpose Matrix
+A <- matrix(c(1,2,3,-1,0,4), ncol = 3, byrow = TRUE)
+A
+matrix.size <- as.data.frame(dim(A))
+row.size <- matrix.size[1,1]
+col.size <- matrix.size[2,1]
+row.size;col.size
+
+A.Transpose <- c()
+for (i in 1:col.size) {
+  A.Transpose <- rbind(A.Transpose, A[,i] )
+  
+}
+A.Transpose
+```
+
+```{r}
+##Matrix multiplication
+X <- A%*%A.Transpose
+Y <- A.Transpose%*%A
+X; Y
+```
+
+
+
+```{r}
+##Calculatio of eigenvalues and eigenvectors
+eigen(X); eigen(Y)
+
+```
+
+```{r}
+##Calculating left-singular, singular values, and right-singular vectors of A.
+svd(A)
+
+
+```
+
+
+```{r}
+##Comparing that the two non-zero eigenvalues  of both X and Y are the same and
+##are squares of the non-zero singular values of A.
+X.n.0.eigenvalues <- round(eigen(X)$values[1:2], 12)
+Y.n.0.eigenvalues <- round(eigen(Y)$values[1:2], 12)
+A.n.0.s <- round((svd(A)$d)^2, 12)
+
+X.n.0.eigenvalues == Y.n.0.eigenvalues
+
+A.n.0.s == Y.n.0.eigenvalues
+```
+
+
+
+###2. Problem Set 2
+Using the procedure outlined in section 1 of the weekly handout, write a function to compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order to compute the co-factors, you may use built-in commands to compute the determinant. Your function should have the following signature:
+*B = myinverse(A)*
+
+where A is a matrix and B is its inverse and $A\times B=I$. The off-diagonal elements of I should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if not 1. Small numerical precision errors are acceptable but the function myinverse should be correct and must use co-factors and determinant of A to compute the inverse.
+
+Please submit PS1 and PS2 in an R-markdown document with your first initial and last name.
+
+**The process that will use to calculate the inverse of the matrix A is through co-factors and determinants:
+
+$${ A }^{ -1 }=\frac { { C }^{ T } }{ det(A) } $$
+
+The code below creates a square matrix given the parameter m.size.
+```{r}
+m.size <- 4
+##Genearates a square matrix of size "m.size" filled with random numbers between 1 to 10
+M <- matrix(sample.int(10, size = m.size^2, replace = T), nrow = m.size)
+```
+
+
+
+The code below
+```{r}
+myinverse <- function(M) {
+cofactor.list <- c()
+##Finds the column and rown size of the matrix M
+i.final <- nrow(M)
+j.final <- ncol(M)
+
+i <- 1
+j <- 1
+
+sub.matrix <- M[-i,-j]
+sub.matrix
+det(sub.matrix)
+##Loops through the i and j indeces of the matrix M
+for (i in 1:i.final){
+  for(j in 1:j.final){
+sub.matrix <- M[-i,-j]  
+sub.matrix.det <- det(sub.matrix)*(-1)**(i+j)
+cofactor.list <- c(cofactor.list, sub.matrix.det)
+}
+}
+##Creates a matrix of cofactors.
+CF <- matrix(cofactor.list, ncol = j.final, byrow = TRUE)
+##Calculates the Transpose of the cofactor Matrix
+CF.Transpose <- c()
+for (i in 1:(ncol(CF))) {
+  CF.Transpose <- rbind(CF.Transpose, CF[,i] )
+}
+##Calculates the inverse of matrix M as the tranpose of the cofactor matrix divded by the determinant of M
+M.det <- det(M)
+Inverse <- CF.Transpose/M.det
+#Returns the inverse matrix
+return(Inverse)
+}
+
+```
+**Comparing output of the myinverse() and inv() function from matlib:**
+```{r}
+library(matlib)
+myinverse(M)
+inv(M)
+```
+
