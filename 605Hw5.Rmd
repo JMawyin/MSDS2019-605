@@ -1,0 +1,85 @@
+---
+title: "605 - HW 5"
+author: "Jose Mawyin"
+date: "9/25/2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+library(Ryacas)
+```
+
+## Choose independently two numbers B and C at random from the interval [0, 1] with uniform density. Prove that B and C are proper probability distributions.
+Note that the point (B,C) is then chosen at random in the unit square.
+
+###Find the probability that:
+```{r}
+B <- runif(10000, 0, 1)
+C <- runif(10000, 0, 1)
+#B;C
+#hist(A); hist(B)
+```
+
+
+```{r}
+
+```
+
+
+###(a) B + C < 1/2.
+```{r}
+#(B + C) < 1/2
+SUM.B.C <- (B + C)
+hist(SUM.B.C, main = "Histogram of Distribution of B + C", col = "yellow", breaks=20)
+```
+
+```{r}
+length(which(SUM.B.C < 1/2))/length(SUM.B.C)
+```
+**The probability that B + C < 1/2 approaches 0.13**
+```{r}
+
+```
+
+
+###(b) BC < 1/2.
+```{r}
+#B*C < 1/2
+B.Times.C <- B*C
+hist(B.Times.C, col = "yellow", breaks=20)
+length(which(B.Times.C < 1/2))/length(B.Times.C)
+```
+**The probability that BC < 1/2 approaches 0.85**
+
+###(c) |B − C| < 1/2.
+```{r}
+#abs(B - C) < 1/2
+Abs.B.minus.C <- abs(B - C)
+hist(Abs.B.minus.C, col = "yellow", breaks=20)
+length(which(Abs.B.minus.C < 1/2))/length(Abs.B.minus.C)
+```
+**The probability that |B − C| < 1/2 approaches 0.75**
+
+###(d) max{B,C} < 1/2.
+```{r}
+#max{B,C}
+max.B.C <- pmax(B,C)
+hist(max.B.C, col = "yellow", breaks=20)
+length(which(max.B.C < 1/2))/length(max.B.C)
+```
+**The probability that max{B,C} < 1/2 approaches 0.25**
+
+###(e) min{B,C} < 1/2.
+```{r}
+min.B.C <- pmin(B,C)
+hist(min.B.C, col = "yellow", breaks=20)
+length(which(min.B.C < 1/2))/length(min.B.C)
+```
+**The probability that min{B,C} < 1/2 approaches 0.75**
+ 
+ 
