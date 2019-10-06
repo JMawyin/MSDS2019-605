@@ -1,0 +1,72 @@
+---
+title: "605 Discussion Wk 6"
+author: "Jose Mawyin"
+date: "10/5/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+## Chapter 4. Conditional Probability
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+perm = function(n, x) {
+  factorial(n) / factorial(n-x)
+}
+
+comb = function(n, x) {
+  factorial(n) / factorial(n-x) / factorial(x)
+}
+```
+
+###15.  (a) What is the probability that your bridge partner has exactly two aces, given that she has at least one ace?
+$$P\left( F|E \right) =\frac { P\left( F\cap E \right)  }{ P\left( E \right)  }$$
+There are 52 different cards in a deck and each bridge hand has 13 cards. First we find the probability of having two aces given having at least one ace:
+```{r}
+Top.A <- (comb(48,11)*comb(4,2)/comb(52,13))
+```
+
+$$P\left( F\cap E \right) =\frac { \left( \begin{matrix} 48 \\ 11 \end{matrix} \right) \left( \begin{matrix} 4 \\ 2 \end{matrix} \right)  }{ \left( \begin{matrix} 52 \\ 13 \end{matrix} \right)  }$$
+
+
+Then we find the probability of having at least once ace:
+```{r}
+Bottom.A <- (comb(52,13)-comb(48,13))/comb(52,13)
+```
+$$P\left( E \right) =\frac { \left( \begin{matrix} 52 \\ 13 \end{matrix} \right) -\left( \begin{matrix} 48 \\ 13 \end{matrix} \right)  }{ \left( \begin{matrix} 52 \\ 13 \end{matrix} \right)  } $$
+Therefore:
+```{r}
+Top.A/Bottom.A
+```
+
+$$P\left( F|E \right) =\frac { P\left( F\cap E \right)  }{ P\left( E \right)  } =\frac { \left( \begin{matrix} 48 \\ 11 \end{matrix} \right) \left( \begin{matrix} 4 \\ 2 \end{matrix} \right)  }{ \left( \begin{matrix} 52 \\ 13 \end{matrix} \right) -\left( \begin{matrix} 48 \\ 13 \end{matrix} \right)  } =0.307$$
+
+
+###     (b) What is the probability that your bridge partner has exactly two aces, given that she has the ace of spades?
+$$P\left( F|E \right) =\frac { P\left( F\cap E \right)  }{ P\left( E \right)  }$$
+
+Just as before, we start knowing that there are 52 different cards in a deck and each bridge hand has 13 cards. We need to find first the probability:
+```{r}
+Top.B <- (comb(48, 11)*comb(3, 1))/comb(52,13)
+```
+
+$$P\left( F\cap E \right) =\frac { \left( \begin{matrix} 48 \\ 11 \end{matrix} \right) \left( \begin{matrix} 3 \\ 1 \end{matrix} \right)  }{ \left( \begin{matrix} 52 \\ 13 \end{matrix} \right)  } $$
+
+To find the the probability of having the ace of spades:
+```{r}
+Bottom.B <- comb(51,12)/comb(52,13)
+```
+
+$$P\left( E \right) =\frac { \left( \begin{matrix} 51 \\ 12 \end{matrix} \right)  }{ \left( \begin{matrix} 52 \\ 13 \end{matrix} \right)  }$$
+
+
+Therefore:
+```{r}
+Top.B/Bottom.B
+```
+$$P\left( F|E \right) =\frac { P\left( F\cap E \right)  }{ P\left( E \right)  } =\frac { \left( \begin{matrix} 48 \\ 11 \end{matrix} \right) \left( \begin{matrix} 3 \\ 1 \end{matrix} \right)  }{ \left( \begin{matrix} 51 \\ 12 \end{matrix} \right)  } =0.427$$
+
+
+
