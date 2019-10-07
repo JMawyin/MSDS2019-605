@@ -1,0 +1,224 @@
+---
+title: "605 - HomeWork 6"
+author: "Jose Mawyin"
+date: "10/6/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gtools)
+```
+
+
+###1. A box contains 54 red marbles, 9 white marbles, and 75 blue marbles. If a marble is randomly selected from the box, what is the probability that it is red or blue? Express your answer as a fraction or a decimal number rounded to four decimal places.
+```{r}
+red <- 54
+white <- 9
+blue <- 75
+Total.1 <- sum(red, white, blue)
+Prob.Red.1 <- red/Total.1
+Prob.Blue.1 <- blue/Total.1
+Prob.Red.Or.Blue <- Prob.Red.1 + Prob.Blue.1
+
+cat("The probability that chosen marble is red or blue is", round(Prob.Red.Or.Blue,4))
+```
+
+
+###2. You are going to play mini golf. A ball machine that contains 19 green golf balls, 20 red golf balls, 24 blue golf balls, and 17 yellow golf balls, randomly gives you your ball. What is the probability that you end up with a red golf ball? Express your answer as a simplified fraction or a decimal rounded to four decimal places.
+```{r}
+green <- 19
+red <- 20
+blue <- 24
+yellow <- 17
+Total.2 <- sum(green, red, blue, yellow)
+Prob.Red.2 <- red/Total.2
+cat("The probability that you end up with a red golf ball is ", Prob.Red.2)
+```
+
+
+###3. A pizza delivery company classifies its customers by gender and location of residence. The research department has gathered data from a random sample of 1399 customers. The data is summarized in the table below.
+
+--------------------      -------   ----------    
+Type of Residence         Males     Females
+Apartment                 81        228
+Dorm                      116       79
+With Parent(s)            215       252
+Sorority/Frat House       130       97
+Other                     129       72
+--------------------      -------   ----------  
+
+What is the probability that a customer is not male or does not live with parents? Write your answer as a fraction or a decimal number rounded to four decimal places.
+
+Let's extend the table:
+
+--------------------      -------   ----------    ---------  
+Type of Residence         Males     Females       Total
+Apartment                 81        228           309
+Dorm                      116       79            195
+With Parent(s)            215       252           467
+Sorority/Frat House       130       97            227
+Other                     129       72            201
+--------------------      -------   ----------    ---------  
+Total                     671       728           1399
+--------------------      -------   ----------    ---------  
+
+The probability of a customer not being male is the probability of a customer being female:
+```{r}
+female.3 <- 728
+Total.3 <- 1399
+Prob.Female.3 <- female.3/Total.3
+cat("The probability of a customer not being male is", round(Prob.Female.3,4))
+```
+
+```{r}
+LwithP.3 <- 467
+NLwithP.3 <- Total.3 - LwithP.3
+Prob.NLwithP.3 <- NLwithP.3/Total.3
+cat("The probability of a customer does not live with parents is", round(Prob.NLwithP.3,4))
+```
+
+
+
+###4. Determine if the following events are independent. Going to the gym. Losing weight.
+Answer: A) Dependent B) Independent
+**I (and most people) go to the gym to increase calorie burn and  lose weight. If so (A), Going to the gym -> Losing Weigh.**
+
+###5. A veggie wrap at City Subs is composed of 3 different vegetables and 3 different condiments wrapped up in a tortilla. If there are 8 vegetables, 7 condiments, and 3 types of tortilla available, how many different veggie wraps can be made?
+```{r}
+comb = function(n, x) {
+  factorial(n) / factorial(n-x) / factorial(x)
+}
+Veg.Combs <- comb(8,3)
+Cond.Combs <- comb(7,3)
+Tortillas <- 3
+Wrap.Combs <- Veg.Combs * Cond.Combs * Tortillas
+cat("There are", Wrap.Combs,"different veggie wrap combinations.")
+```
+
+
+###6. Determine if the following events are independent.
+Jeff runs out of gas on the way to work. Liz watches the evening news.
+Answer: A) Dependent B) Independent
+**Unless, Jeff running out of gas causes somehow Liz to watch the evening news (very unlikely event). This is an example of (B), Independent events.**
+
+###7. The newly elected president needs to decide the remaining 8 spots available in the cabinet he/she is appointing. If there are 14 eligible candidates for these positions (where rank matters), how many different ways can the members of the cabinet be appointed?
+**Since rank matters, we calculate the different arrangements as a permutations (instead of combinations).**
+```{r}
+#Defining a Permuation Function
+perm <- function(n,k){choose(n,k) * factorial(k)}
+answer.7 <- perm(14,8)
+cat("There are" , answer.7, "ways to appoint the members of the cabinet.")
+```
+
+
+###8. A bag contains 9 red, 4 orange, and 9 green jellybeans. What is the probability of reaching into the bag and randomly withdrawing 4 jellybeans such that the number of red ones is 0, the number of orange ones is 1, and the number of green ones is 3? Write your answer as a fraction or a decimal number rounded to four decimal places.
+```{r}
+c.Red <- choose(9,0)
+c.Orange <- choose(4,1)
+c.Green <- choose(9,3)
+Total <- choose(22,4)
+Four.Bean.Probability <- round(c.Red*c.Orange*c.Green/Total,4)
+cat("The probability of reaching into the bag and randomly withdrawing 4 jellybeans such that the number of red ones is 0, the number of orange ones is 1, and the number of green ones is 3 is", Four.Bean.Probability)
+```
+
+
+
+
+###9. Evaluate the following expression.
+$$\frac { 11! }{ 7! } $$
+```{r}
+answer.9 <- factorial(11)/factorial(7)
+cat("The result is: ", answer.9)
+```
+
+
+###10. Describe the complement of the given event.
+
+67% of subscribers to a fitness magazine are over the age of 34.
+**The Complement of an event is all the other outcomes. In this case, the complement is the 33% of subscribers that are under the age of 34**
+
+###11. If you throw exactly three heads in four tosses of a coin you win $97. If not, you pay me $30. Step 1. Find the expected value of the proposition. Round your answer to two decimal places.
+
+$${P\quad =\left( \begin{matrix} n \\ k \end{matrix} \right) { p }^{ k }{ \left( 1-p \right)  }^{ \left( n-k \right)}}$$
+
+```{r}
+n.11 <- 4
+k.11 <- 3
+p.11 <- 0.5
+success.11 <- dbinom(k.11, n.11, p.11)
+failure.11 <- 1-success.11
+Value.11 <- success.11*97-failure.11*30
+cat("The expected value of the proposition for one game is $", Value.11)
+```
+
+Step 2. If you played this game 559 times how much would you expect to win or lose? (Losses must be entered as negative.)
+
+```{r}
+599*Value.11
+```
+
+
+###12. Flip a coin 9 times. If you get 4 tails or less, I will pay you $23. Otherwise you pay me $26. Step 1. Find the expected value of the proposition. Round your answer to two decimal places.
+
+**This is an example of a binomial distribution where we can find the probability of getting 4 tails or less given that n is 9, k is 4 and the probability is 0.5:**
+
+$${P\quad =\left( \begin{matrix} n \\ k \end{matrix} \right) { p }^{ k }{ \left( 1-p \right)  }^{ \left( n-k \right)  }}$$
+
+```{r}
+Prob.4.Tails <- pbinom(4, 9, 0.5)
+Prob.No.4.Tails <- 1 - Prob.4.Tails
+cat("The probability of getting 4 tails or less is ", Prob.4.Tails, ". Therefore the probability of not getting 4 tails or less is ", Prob.No.4.Tails )
+```
+The value proposition per game is:
+```{r}
+Value.Prop.12 <- 23*Prob.4.Tails - 26*Prob.No.4.Tails
+cat("The value proposition per game is $", Value.Prop.12)
+```
+
+
+Step 2. If you played this game 994 times how much would you expect to win or lose? (Losses must be entered as negative.)
+```{r}
+Total.Value.12 <- 994*Value.Prop.12
+cat("If you were to play this game 994 times, you would be expected to have a net change of $", Total.Value.12)
+```
+
+
+
+###13. The sensitivity and specificity of the polygraph has been a subject of study and debate for years. A 2001 study of the use of polygraph for screening purposes suggested that the probability of detecting a liar was .59 (sensitivity) and that the probability of detecting a "truth teller" was .90 (specificity). We estimate that about 20% of individuals selected for the screening polygraph will lie.
+**This is a case of conditional probability:**
+$$P\left( F|E \right) =\frac { P\left( F\cap E \right)  }{ P\left( E \right)  }$$
+```{r}
+#Probabilities of detecting liar and truthteller
+PD.L <- 0.59
+PD.T <- 0.90
+#Probability of being a liar or truthteller
+LR <- 0.2
+TT <- 0.8
+```
+
+
+a. What is the probability that an individual is actually a liar given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both.)
+```{r}
+P.a.13 <- (PD.L*LR)/(PD.L*LR + (1-PD.T)*TT)
+cat("The probability that an individual is actually a liar given that the polygraph detected him/her as such is ", P.a.13)
+```
+
+
+
+b. What is the probability that an individual is actually a truth-teller given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both.)
+```{r}
+P.b.13 <- (PD.T*TT)/(PD.T*TT + (1-PD.L)*LR)
+cat("The probability that an individual is actually a truth-teller given that the polygraph detected him/her as such is ", P.b.13)
+```
+
+
+c. What is the probability that a randomly selected individual is either a liar or was identified as a liar by the polygraph? Be sure to write the probability statement.
+**We can find this probability using the Inclusion–exclusion principle:**
+$$A\cup B=A+B-A\cap B$$
+**"The formula expresses the fact that the sum of the sizes of the two sets may be too large since some elements may be counted twice. The double-counted elements are those in the intersection of the two sets and the count is corrected by subtracting the size of the intersection."**
+```{r}
+P.c.13 <- PD.L + LR - (PD.L * LR)
+cat("The probability that a randomly selected individual is either a liar or was identified as a liar by the polygraph is ", P.c.13)
+```
+
