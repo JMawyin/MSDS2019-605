@@ -1,0 +1,114 @@
+---
+title: "605-HW7"
+author: "Jose Mawyin"
+date: "10/11/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Let X1, X2, . . . , Xn be n mutually independent random variables, each of which is uniformly distributed on the integers from 1 to k. Let Y denote the minimum of the Xi’s. Find the distribution of Y .
+$${ Distribution }_{ Y }\quad =\quad \frac { Options\quad of\quad the\quad Set\quad Y }{ All\quad Options }$$
+First we count the way to have values of X between k and a minimum value y.
+$$Options\quad of\quad the\quad Set\quad Y\quad =\quad { \left( k-y \right)  }^{ n }-\left( k-y \right)$$
+
+And there are ${ k }^{ n }$ ways to have n X values between 1 to k.
+
+$$All\quad Options\quad =\quad { k }^{ n }$$
+
+$${ Distribution }_{ Y }\quad =\quad \frac { { \left( k-y \right)  }^{ n }-\left( k-y \right)  }{ { k }^{ n } }$$
+
+2. Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer’s expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+
+a. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years..)
+
+*We will use the equation for probability equation for geometric distributions:*
+
+$${ P }_{ geometric }\quad =\quad { \left( 1-p \right)  }^{ n-1 }p$$
+
+
+given p (failure probability per year) as 1/10 and n as 9 (number of years until failure).
+
+```{r}
+n.a <- 9
+p.a <- 1/10
+
+Prob.geom <- 0
+
+
+for(i in 1:n.a){
+  Prob.geom <- Prob.geom + p.a * ( (1-p.a)^(i-1) )
+
+}
+Prob.geom 
+cat("The probability of failure after 8 years is:", Prob.geom)
+```
+
+```{r}
+mean.a <- p.a^(-1)
+SD.a <- sqrt((1-p.a)/(p.a^2))
+cat("Using a Geometric distribution the expected value is", mean.a, " and the standard deviation is ", SD.a )
+```
+
+
+
+b. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential.
+$${ P }_{ Exponential }\quad \approx \quad { e }^{ -\lambda t }$$
+
+```{r}
+lambda.d <- 1/10
+t.d <- 8
+Prob.Expo <- (2.71828)^(-lambda.d*t.d)
+cat("The probability that the machine will fail after 8 years using a exponential distribution is:", Prob.Expo)
+```
+
+```{r}
+mean.b <- 1/lambda.d
+SD.b <- mean.b
+cat("Using a Exponential distribution the expected value is", mean.b, " and the standard deviation is ", SD.b )
+```
+
+
+c. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+$${P\quad =\left( \begin{matrix} n \\ k \end{matrix} \right) { p }^{ k }{ \left( 1-p \right)  }^{ \left( n-k \right)  }}$$
+```{r}
+n.c <- 8
+k.c <- 0
+p.c <- 1/10
+Prob.Binom <- pbinom(k.c, n.c, p.c)
+cat("The probability that the machine will fail after 8 years using a Binomial distribution is:", Prob.Binom) 
+```
+
+```{r}
+mean.c <- n.c * p.c
+SD.c <- sqrt(n.c * p.c - (Prob.Binom))
+cat("Using a Binomial distribution the expected value is", mean.c, " and the standard deviation is ", SD.c )
+```
+
+
+d. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson.
+
+$${ P }_{ Poisson }\quad \approx \quad \frac { { \left( \lambda t \right)  }^{ k } }{ k! } { e }^{ -\lambda t }$$
+
+
+```{r}
+lambda.d <- 1/10
+r.d <- 0
+t.d <- 8
+Prob.poisson <- ( (lambda.d*t.d)^r.d / (factorial(r.d)) ) * (2.71828)^(-lambda.d*t.d)
+cat("The probability that the machine will fail after 8 years using a Poisson distribution is:", Prob.poisson )
+```
+
+```{r}
+mean.d <- lambda.d * t.d
+SD.d <- sqrt(mean.d)
+cat("Using a Poisson distribution the expected value is", mean.d, " and the standard deviation is ", SD.d )
+```
+
+
+
+
