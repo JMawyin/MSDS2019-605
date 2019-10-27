@@ -1,0 +1,34 @@
+---
+title: "605-Week9Discussion"
+author: "Jose Mawyin"
+date: "10/26/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 605 Week9 Discussion
+
+####A tourist in Las Vegas was attracted by a certain gambling game in which the customer stakes 1 dollar on each play; a win then pays the customer 2 dollars plus the return of her stake, although a loss costs her only her stake. Las Vegas insiders, and alert students of probability theory, know that the probability of winning at this game is 1/4. When driven from the tables by hunger, the tourist had played this game 240 times. Assuming that no near miracles happened, about how much poorer was the tourist upon leaving the casino? What is the probability that she lost no money?
+
+*We can find the expected losses with the following gain/loss proposition:*
+
+```{r}
+Return <- (1/4)*(2) - (3/4)
+Expected.Loss <- 240*Return
+cat("The expected loss after the tourist had played this game 240 times is $",Expected.Loss*-1)
+```
+
+*We can find the probability of losing no money after 240 games if we imagine the games as a series of Bernoulli Trials.*
+
+```{r}
+q<- 1
+size <- 241
+prob <- 1/4
+prob.240 <- pbinom(q, size, prob, lower.tail = TRUE) %>% round(4)
+cat("The probability that she lost no money after 240 games is", prob.240)
+```
+
+*The probability of losing no money is almost non-existant.*
