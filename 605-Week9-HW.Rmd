@@ -1,0 +1,111 @@
+---
+title: "605-Week9"
+author: "Jose Mawyin"
+date: "10/27/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+```
+
+
+
+
+$$\begin{array}{l}{\text { 11. The price of one share of stock in the Pilsdorf Beer Company (see Exer- }} \\ {\text { cise } 8.12 \text { ) is given by } Y_{n} \text { on the } n \text { th day of the year. Finn observes that }} \\ {\text { the differences } X_{n}=Y_{n+1}-Y_{n} \text { appear to be independent random variables }} \\ {\text { with a common distribution having mean } \mu=0 \text { and variance } \sigma^{2}=1 / 4 . \text { If }} \\ {Y_{1}=100, \text { estimate the probability that } Y_{365} \text { is: }}\end{array}$$
+
+$${\textbf { (a) } \geq 100}$$
+We can solve this problem with the pnorm function from R:
+
+$$\operatorname{Pr}(X \leq x)=F(x)=\frac{1}{2}\left[1+\operatorname{erf}\left(\frac{x-\mu}{\sigma \sqrt{2}}\right)\right]$$
+that given a number x it computes the probability that a normally distributed random number will be less than that number. 
+
+```{r}
+mean <- 0
+x <- 100
+var <- 1/4
+diff <- x - 100 
+sd<- sqrt(var)
+n <- 365-1
+q <- diff/sqrt(n)
+p <- pnorm(q, mean, sd, lower.tail = FALSE) %>% round(2)
+cat("The probability that that Y365 is more or equal than", x, "is", p)
+```
+$${\textbf { (b) } \geq 110}$$
+```{r}
+mean <- 0
+x <- 110
+var <- 1/4
+diff <- x - 100
+sd<- sqrt(var)
+n <- 365-1
+q <- diff/sqrt(n)
+p <- pnorm(q, mean, sd, lower.tail = FALSE) %>% round(2)
+cat("The probability that that Y365 is more or equal than", x, "is", p)
+```
+
+$${\textbf { (c) } \geq 120}$$
+
+```{r}
+mean <- 0
+x <- 120
+var <- 1/4
+diff <- x-100 
+sd<- sqrt(var)
+n <- 365-1
+q <- diff/sqrt(n)
+p <- pnorm(q, mean, sd, lower.tail = FALSE) %>% round(2)
+cat("The probability that that Y365 is more or equal than", x, "is", p)
+```
+
+***Calculate the expected value and variance of the binomial distribution using the moment generating function.**
+
+Let's start with the binomial distribution:
+
+$$b(x ; n, p)=\frac{n !}{x !(n-x) !} p^{x} q^{n-x} \quad \text { with } \quad q=1-p$$
+The moment generating function is of the form:
+
+$$M_{x}(t)=\sum_{x=0}^{n} e^{x t} \frac{n !}{x !(n-x) !} p^{x} q^{n-x}$$
+$$M(t)=\left(q+p e^{t}\right)^{n}$$
+
+
+We can then calculate the mean as the first derivative of the moment generating function:
+
+$$M^{\prime}(t)=n\left[1-p+p e^{t}\right]^{n-1}\left(p e^{t}\right)$$
+solving we find: 
+$$\mu=n p$$
+
+and the variance as the second derivative of the moment generating function:
+
+$$M^{\prime \prime}(t)=n\left[1-p+p e^{t}\right]^{n-1}\left(p e^{t}\right)+\left(p e^{t}\right) n(n-1)\left[1-p+p e^{t}\right]^{n-2}\left(p e^{t}\right)$$
+solving we find: 
+$$\sigma^{2}=n p(1-p)$$
+
+
+**Calculate the expected value and variance of the exponential distribution using the moment generating function.**
+
+Let's start with the exponential distribution:
+
+$$f(x)=\frac{1}{\theta} e^{-x / \theta}$$
+
+The moment generating function is of the form:
+$$M_{x}(t)=E\left(e^{t X}\right)=\int_{0}^{\infty} e^{t x}\left(\frac{1}{\theta}\right) e^{-x / \theta} d x$$
+$$M(t)=\left[(1-p)+p e^{t}\right]^{n}$$
+
+
+We can then calculate the mean as the first derivative of the moment generating function:
+
+$$M^{\prime}(t)=n\left[p e^{t}+(1-p)\right]^{n-1} p e^{t}$$
+solving we find: 
+
+$$\mu=n(n-1) p^{2}+n p$$
+
+and the variance as the second derivative of the moment generating function:
+
+$$M^{\prime \prime}(t)=n(n-1)\left[p e^{t}+(1-p)\right]^{n-2} p^{2} e^{2 t}+n\left[p e^{t}+(1-p)\right]^{n-1} p e^{t}$$
+solving we find:
+
+$$\sigma^{2}=\frac{1-p}{p^{2}}$$
+
+
