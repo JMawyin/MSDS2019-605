@@ -1,0 +1,130 @@
+---
+title: "605 - Week 10 Assigment"
+author: "Jose Mawyin"
+date: "11/3/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+library(matlib)
+```
+
+## 605 - Week 10 Assigment
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars.
+A guard agrees to make a series of bets with him. If Smith bets A dollars, he wins A dollars with probability .4 and loses A dollars with probability .6.
+Find the probability that he wins 8 dollars before losing all of his money if:
+
+First, we need to find the transition matrix for the following problem in the form below:
+$$\mathbf{P}=\left(\begin{array}{c|c}{\mathbf{Q}} & {\mathbf{R}} \\ \hline \mathbf{0} & {\mathbf{I}}\end{array}\right)$$
+$$\begin{array}{l}{\text { Here I is an } r \text { -by-r indentity matrix, } 0 \text { is an } r \text { -by- } t \text { zero matrix, } \mathbf{R} \text { is a nonzero }} \\ {t \text { -by-r matrix, and } \mathbf{Q} \text { is an } t \text { -by-t matrix. }}\end{array}$$
+
+The we can use these submatrices to find N the fundamental Matrix:
+$$\mathbf{N}=(\mathbf{I}-\mathbf{Q})^{-1}$$
+$$\begin{array}{l}{\text { Definition 11.3 For an absorbing Markov chain } \mathbf{P}, \text { the matrix } \mathbf{N}=(\mathbf{I}-\mathbf{Q})^{-1} \text { is }} \\ {\text { called the fundamental matrix for } \mathbf{P} \text { . The entry } n_{i j} \text { of } \mathbf{N} \text { gives the expected number }} \\ {\text { of times that the process is in the transient state } s_{j} \text { if it is started in the transient }} \\ {\text { state } s_{i} \text { . }}\end{array}$$
+Finally, we can calculate the absortion probability matrix B:
+$$\begin{array}{l}{\text { Theorem } 11.6 \text { Let } b_{i j} \text { be the probability that an absorbing chain will be absorbed }} \\ {\text { in the absorbing state } s_{j} \text { if it starts in the transient state } s_{i} . \text { Let } \mathbf{B} \text { be the matrix }} \\ {\text { with entries } b_{i j} . \text { Then } \mathbf{B} \text { is an } t \text { -by-r matrix, and }} \\ {\qquad \mathbf{B}=\mathbf{N} \mathbf{R}} \\ {\text { where } \mathbf{N} \text { is the fundamental matrix and } \mathbf{R} \text { is as in the canonical form. }}\end{array}$$
+
+(a) he bets 1 dollar each time (timid strategy).
+
+*The probability matrix P for the timid approach is:*
+```{r, echo=FALSE}
+Timid.P <- matrix(c(0,0.4,0,0,0,0,0,0.6,0,
+                    0.6,0,0.4,0,0,0,0,0,0,
+                    0,0.6,0,0,0.4,0,0,0,0,
+                    0,0,0.6,0,0.4,0,0,0,0,
+                    0,0,0,0.6,0,0.4,0,0,0,
+                    0,0,0,0,0.6,0,0.4,0,0,
+                    0,0,0,0,0,0.6,0,0,0.4,
+                    0,0,0,0,0,0,0,1,0,
+                    0,0,0,0,0,0,0,0,1), ncol = 9, byrow = TRUE)
+Timid.P
+```
+*The timid matrix Q is:*
+```{r, echo=FALSE}
+Timid.P.Q <- matrix(c(0,0.4,0,0,0,0,0,
+                      0.6,0,0.4,0,0,0,0,
+                      0,0.6,0,0,0.4,0,0,
+                      0,0,0.6,0,0.4,0,0,
+                      0,0,0,0.6,0,0.4,0,
+                      0,0,0,0,0.6,0,0.4,
+                      0,0,0,0,0,0.6,0), ncol = 7, byrow = TRUE)
+Timid.P.Q
+```
+*The timid matrix R is:*
+```{r, echo=FALSE}
+Timid.P.R <- matrix(c(0.6,0,
+                      0,0,
+                      0,0,
+                      0,0,
+                      0,0,
+                      0,0,
+                      0,0.4), ncol = 2, byrow = TRUE)
+Timid.P.R
+```
+
+*The fundamental matrix N is:*
+```{r, echo=FALSE}
+Timid.N <- (diag(7)-Timid.P.Q) %>% inv() %>% round(3)
+Timid.N
+```
+*The absortion probability matrix B is:*
+
+```{r, echo=FALSE}
+Timid.B <- (Timid.N %*% Timid.P.R) %>% round(3)
+Timid.B
+cat("The timid probability to go from 1 dollar to 8 is:", Timid.B[1,2])
+```
+
+(b) he bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (bold strategy).
+*The probability matrix P for the bold approach is:*
+
+```{r, echo=FALSE}
+Bold.P <- matrix(c(0,0.4,0,0.6,0,
+                   0,0,0.4,0.6,0,
+                   0,0,0,0.6,0.4,
+                   0,0,0,1,0,
+                   0,0,0,0,1), ncol = 5, byrow = TRUE)
+Bold.P
+```
+*The bold matrix Q is:*
+```{r, echo=FALSE}
+Bold.P.Q <- matrix(c(0,0.4,0,
+                     0,0,0.4,
+                     0,0,0),ncol = 3, byrow = TRUE)
+Bold.P.Q
+```
+*The bold matrix R is:*
+```{r, echo=FALSE}
+Bold.P.R <- matrix(c(0.6,0,
+                     0.6,0,
+                     0.6,0.4),ncol = 2, byrow = TRUE)
+Bold.P.R
+```
+*The fundamental matrix N is:*
+```{r, echo=FALSE}
+Bold.N <- (diag(3)-Bold.P.Q) %>% inv() %>% round(3)
+Bold.N
+```
+
+*The absortion probability matrix B is:*
+
+```{r, echo=FALSE}
+Bold.B <- (Bold.N %*% Bold.P.R) %>% round(3)
+Bold.B
+cat("The bold probability to go from 1 dollar to 8 is:", Bold.B[1,2])
+```
+
+(c) Which strategy gives Smith the better chance of getting out of jail?
+
+```{r, echo=FALSE, results = 'asis'}
+cat("The bold strategy leads to a higher probability",Bold.B[1,2] ,"to reach 8 dollars starting from 1 dollar. Compared to the lower probability of",Timid.B[1,2] ," for the timid strategy.")
+```
+
+
+
+
+
+
+
