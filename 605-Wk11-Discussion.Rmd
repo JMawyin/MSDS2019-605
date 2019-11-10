@@ -1,0 +1,146 @@
+---
+title: "605-Wk11-Discussion"
+author: "Jose Mawyin"
+date: "11/9/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(alr3)
+library(alr4)
+```
+
+### Linear Regression of Factors Important to  Lake Population of Zooplankton Species
+
+1. Introduction
+2. Data
+3. Linear Regresssion Using All Factors
+4. Backward Elimination of Factors
+5. Comments
+
+
+###1.Introduction
+This is a case study of how to use linear regression to see how we different independent variables affect a system’s response. In this case, the system’s response is the number of crustacean zooplankton species and the independent variables are 10 different parameters gathered at 69 world lakes.
+
+###2.Data
+These data give the number of known crustacean zooplankton species for 69 world lakes. Also included are a number of characteristics of each lake. There are missing values.
+
+**Format**
+
+This data frame uses lake name as row label and contains the following columns:
+
+Species: Number of zooplankton species
+
+MaxDepth: Maximum lake depth, m
+
+MeanDepth: Mean lake depth, m
+
+Cond: Specific conductance, micro Siemans
+
+Elev: Elevation, m
+
+Lat: N latitude, degrees
+
+Long: W longitude, degrees
+
+Dist: distance to nearest lake, km
+
+NLakes: number of lakes within 20 km
+
+Photo: Rate of photosynthesis, mostly by the 14C method
+
+Area: Lake area, in hectares
+
+**Source**
+
+*Dodson, S. (1992), Predicting curstacean zooplankton species richness, Limnology and Oceanography, 37, 848–856.*
+
+```{r}
+data(lakes)
+head(lakes)
+```
+
+###3. Linear Regresssion Using All Factors
+
+First, let's try linar regression using all 10 independent variables: Area, Cond, Dist, Elev, Lat, Long, MaxDepth, MeanDepth, NLakes and Photo
+```{r}
+attach(lakes)
+Species.lm <- lm(Species ~  Area+ Cond+ Dist+ Elev+ Lat+ Long+ MaxDepth+ MeanDepth+ NLakes+ Photo+ Species)
+```
+
+We see how all 10 variables account for 73% percent of the data’s variation. The residuals, difference between the actual measured value stored in the data frame and the value that the fitted regression line predicts for that corresponding data point, plot appear evenly spaced around 0. Our quantile-versus-quantile (Q-Q) plot follow a straight line. 
+```{r}
+summary(Species.lm)
+plot(fitted(Species.lm),resid(Species.lm))
+qqnorm(resid(Species.lm))
+qqline(resid(Species.lm))
+```
+ 
+ Let's see how the removal of some of the independent variables affect the linear regressio model.
+
+###4. Removal of Factors
+
+**Removing Longitude (degrees)**
+
+Longitude spcefies the east–west position of a point on the Earth's surface.
+```{r}
+Species.lm <- update(Species.lm, .~. - Long, data=lakes)
+summary(Species.lm)
+```
+
+**Removing Specific conductance (micro Siemans)**
+
+Specific conductance is a measure of a solution's ability to conduct electricity.
+```{r}
+Species.lm <- update(Species.lm, .~. - Cond, data=lakes)
+summary(Species.lm)
+```
+
+**Removing Rate of Photosynthesis**
+
+```{r}
+Species.lm <- update(Species.lm, .~. - Photo, data=lakes)
+summary(Species.lm)
+```
+
+**Removing Latitude (degrees)**
+
+The geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+```{r}
+Species.lm <- update(Species.lm, .~. - Lat, data=lakes)
+summary(Species.lm)
+```
+
+At the end of this process of eliminaition we have seen how the three most important independent variables that predict the number of lake species are: Lake area, distance to nearest lake and Elevation with all these variables having a P value less than our critical value of 0.05.
+
+###5. Comments
+
+What happens when remove the next two independent variables with P values that do not meet our critical values?
+
+**Removing Mean Lake Depth (m)**
+
+```{r}
+Species.lmA <- update(Species.lm, .~. - MeanDepth, data=lakes)
+summary(Species.lmA)
+plot(fitted(Species.lmA),resid(Species.lmA))
+qqnorm(resid(Species.lmA))
+qqline(resid(Species.lmA))
+```
+
+Our P values improved.
+
+Let's see what happens when we remove the next critical value.
+
+**Removing Number of Lakes within 20 km**
+
+```{r}
+Species.lmB <- update(Species.lm, .~. - NLakes, data=lakes)
+summary(Species.lmB)
+plot(fitted(Species.lmB),resid(Species.lmB))
+qqnorm(resid(Species.lmB))
+qqline(resid(Species.lmB))
+```
+
+Our critival P values increased slighlty. There is a limit to this eliminatin process at which the model does not improve even when including factors with higher than critical value P-factors.
+
