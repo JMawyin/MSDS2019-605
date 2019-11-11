@@ -1,0 +1,69 @@
+---
+title: "605-Wk11-Homework"
+author: "Jose Mawyin"
+date: "11/9/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+### Linear regression model of stopping distance as a function of speed from the "Cars" dataset
+
+First, lets load the dataset cars that contains 50 observations of two variables. The independent variable is vehicle's speed and the response variable is the vehicle's stopping distance.
+
+```{r}
+data("cars")
+head(cars)
+```
+
+We can easily create a linear fit regression model.
+
+```{r}
+attach(cars)
+Cars.lm <- lm(dist ~  speed)
+```
+
+Plotting a linear regression fit line we can see the speed vs. stopping distance response.
+
+```{r,fig.height=3}
+ggplot(cars, aes(x=speed, y=dist)) + geom_point() + geom_smooth(method='lm')
+```
+
+Looking into the statistics summary of the linear regression, we see that speed variable explains 65% of our data and that is has a P value (1.49e-12) well below the typical treshold of 0.05. 
+
+```{r}
+summary(Cars.lm)
+```
+
+The residuals plot below show how the residuals are evenly distributed around the origin (residual = 0). We can visualize this using a linear fit line that in our case passes directly over the x-axis as shown below.
+```{r,fig.height=3}
+ggplot(cars, aes(x=fitted(Cars.lm), y=resid(Cars.lm))) + geom_point() + geom_smooth(method='lm')
+```
+
+The residuals quantile-versus-quantile or Q-Q plot shows interesting results in that:
+
+*...if the model fits the data well, we would expect the residuals to be normally (Gaussian) distributed around a mean of zero.*
+
+We can see that in our Q-Q plot below that the residuals diverge around the tails indicating that the residuals are not normally distributed.
+
+
+```{r }
+
+qqnorm(resid(Cars.lm))
+qqline(resid(Cars.lm))
+```
+
+We can see this more clearly below in a density plot of the residuals. We can easily see how the distribution of the residuals is positively skewed.
+
+
+```{r,fig.height=3}
+ggplot(cars, aes(resid(Cars.lm))) + geom_density(kernel = "gaussian") 
+```
+
+
+
+
+
