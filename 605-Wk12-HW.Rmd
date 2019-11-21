@@ -1,0 +1,187 @@
+---
+title: "605-Wk12-HW"
+author: "Jose Mawyin"
+date: "11/17/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(magrittr)
+library(corrplot)
+knitr::opts_chunk$set(fig.width=5, fig.height=2)
+```
+
+## DATA 605 Wk12-HW.  Regression of Non-Linear Variables
+
+The attached who.csv dataset contains real-world data from 2008. The variables included follow.
+
+*Country: name of the country
+
+*LifeExp: average life expectancy for the country in years
+
+*InfantSurvival: proportion of those surviving to one year or more
+
+*Under5Survival: proportion of those surviving to five years or more
+
+*TBFree: proportion of the population without TB.
+
+*PropMD: proportion of the population who are MDs
+
+*PropRN: proportion of the population who are RNs
+
+*PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate
+
+*GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate 
+
+*TotExp: sum of personal and government expenditures.
+
+```{r, include=FALSE}
+# Read CSV into R
+who.data <- read.csv(file="https://raw.githubusercontent.com/JMawyin/MSDS2019-605/master/who.csv", header=TRUE, sep=",")
+```
+
+```{r,fig.cap="Correlation Plot of all Variables in Dataset", echo=FALSE, fig.height=3}
+who.cor <- who.data
+rownames(who.cor) <- who.cor[,1]
+who.cor <- who.cor[,-1]
+who.correlation <- cor(who.cor)
+corrplot(who.correlation, method = "circle", order = "hclust")
+```
+
+
+
+
+\break
+
+### 1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss whether the assumptions of simple linear regression met.
+
+Looking at the fit parameters we notice that:
+
+*F statistics of 65.26: 
+
+*R^2 of 0.2577: The calculated linear fit model of TotExp accounts for only for 25.77% of the variability of the data. Not a good percentage.
+
+*Standard Error of 7.795e-06: In a good model the standard error should five to ten times smaller than the corresponding coefficient. In our case is `r (6.297e-05/7.795e-06) %>% round(2)` times smaller.
+
+*P-Values of 7.714e-14:  Our found p-value is quite low indicating a very low probability that coefficient is not relevant in the model.
+
+In our linear fit graph in Figure. 3 we notice how poorly a linear line fits the data when the relationship LifeExp Vs. TotExp is not linear but a power relationship.
+
+```{r, echo=FALSE,fig.cap="Scatter Plot of LifeExp Vs. TotExp"}
+ggplot(who.data, aes(x=LifeExp, y=TotExp)) + geom_point()
+```
+
+```{r, echo=FALSE}
+attach(who.data)
+who.lm <- lm(LifeExp ~  TotExp)
+summary(who.lm)
+```
+
+```{r, echo=FALSE,fig.cap="Scatter Plot and Linear Fit of LifeExp Vs. TotExp"}
+ggplot(who.data, aes(x=LifeExp, y=TotExp)) + geom_point() + geom_smooth(method=lm, se=FALSE) + ggtitle("Scatter and Linear Fit Plot of LifeExp Vs. LifeExp")
+```
+
+\break
+
+### 2. Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better?"
+
+*F statistics of 507.7: 
+
+*R^2 of 0.7298: The calculated linear fit model of TotExp accounts  for 72.98% of the variability of the data. A significant improvement over the 25.77% when using linear variables.
+
+*Standard Error of 27518940: In a good model the standard error should five to ten times smaller than the corresponding coefficient. In our case, by using the using the  LifeExp^4.6 Vs. TotExp^.06 variables it has increased from `r (6.297e-05/7.795e-06) %>% round(2)` to `r (620060216/27518940) %>% round(2)` times smaller.
+
+*P-Values of 2.2e-16:  Our found p-value is quite low indicating a very low probability that coefficient is not relevant in the model.
+
+```{r, message=FALSE, warning=FALSE}
+attach(who.data)
+who.data.2 <- who.data
+who.data.2$LifeExp <- (who.data.2$LifeExp)^4.6
+who.data.2$TotExp <- (who.data.2$TotExp)^0.06
+```
+
+
+
+```{r, echo=FALSE}
+attach(who.data.2)
+who.2.lm <- lm(LifeExp ~  TotExp)
+summary(who.2.lm)
+```
+
+```{r, echo=FALSE,fig.cap="Scatter Plot and Linear Fit of LifeExp^4.6 Vs. TotExp^.06"}
+ggplot(who.data.2, aes(x=LifeExp, y=TotExp)) + geom_point() + geom_smooth(method=lm, se=FALSE) + ggtitle("Scatter and Linear Fit Plot of LifeExp Vs. LifeExp")
+```
+
+
+\break
+
+### 3. Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.
+
+```{r}
+who.2.lm
+TotExp_Power <- 1.5
+LifeExp_Power<- -736527910 + 620060216*(TotExp_Power)
+Life.Exp.at.1.5 <- LifeExp_Power^(1/4.6)
+cat("The forecasted life expectancy when TotExp^.06 =1.5 is", (Life.Exp.at.1.5) %>% round(0)," years.")
+```
+
+```{r}
+who.2.lm
+TotExp_Power <- 2.5
+LifeExp_Power<- -736527910 + 620060216*(TotExp_Power)
+Life.Exp.at.1.5 <- LifeExp_Power^(1/4.6)
+cat("The forecasted life expectancy when TotExp^.06 =2.5 is", (Life.Exp.at.1.5) %>% round(0)," years.")
+```
+
+
+
+\break
+
+### 4. Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?
+LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+attach(who.data)
+who.lm.3 <- lm(LifeExp ~ PropMD + TotExp + PropMD*TotExp)
+summary(who.lm.3)
+```
+
+*F statistics of 34.49: 
+
+
+*R^2 of 0.3574: The calculated linear fit model of TotExp accounts  for 32.74% of the variability of the data. Worse than the previous model using variables to a power.
+
+* Standard Error: In a good model the standard error should five to ten times smaller than the corresponding coefficient. In our case, we have for:
+
+  + PropMD: Standard error `r (1.497e+03/2.788e+02) %>% round(2)` larger than corresponding coefficient.
+  
+  + TotExp: Standard error `r (7.233e-05/8.982e-06) %>% round(2)` larger than corresponding coefficient.
+  
+  + PropMD:TotExp: Standard error `r (6.026e-03/1.472e-03) %>% round(2)` larger than corresponding coefficient.
+
+*P-Values of 2.2e-16:  Our found p-value is quite low indicating a very low probability that coefficient is not relevant in the model. Also, is the same as in the previous case. Puzzling!
+
+\break
+
+### 5. Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+
+
+```{r}
+who.lm.3
+PropMD <- .03
+TotExp <- 14
+LifeExp<- 6.277e+01 + 1.497e+03*PropMD + 7.233e-05*TotExp + (-6.026e-03)*PropMD*TotExp
+cat("The forecasted life expectancy when PropMD=.03 and TotExp = 14 is", (LifeExp) %>% round(0)," years.")
+```
+
+```{r}
+summary(who.data$LifeExp)
+```
+
+The forecasted life expectancy of 108  years sounds in the realm of possibility. However, when checking the summary of the life expectancy data given, we see that the highest recorded value of LifeExp is only 83 years. Therefore, we are extrapolating outside the realm of the data used in the regression model:
+
+**LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp**
+
+
