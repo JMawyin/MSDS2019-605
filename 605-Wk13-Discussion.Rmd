@@ -1,0 +1,63 @@
+---
+title: "605-Wk13-Discussion"
+author: "Jose Mawyin"
+date: "11/23/2019"
+output: pdf_document
+header-includes:
+ \usepackage{float}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos = 'H')
+library(mosaicCalc)
+library(magrittr)
+```
+## 605-Wk13-Discussion
+
+### 7.1 Area Between Curves Problem 7.10
+
+\includegraphics[width=0.7\columnwidth]{/Users/josemawyin/Library/Mobile Documents/com~apple~CloudDocs/Data Science Masters /605/Calculus-7-10.png}
+
+
+```{r}
+F = antiD(sin(x)-cos(x) ~ x)
+F
+Answer7.10 = (F(x = 5*pi/4) - F(x = pi/4))
+cat("The area under the curve is",Answer7.10 %>% round(2), "units.") 
+```
+
+
+
+
+
+
+
+
+\newpage
+
+###  7.3 The Shell Method Problem 7.10
+
+
+\includegraphics[width=0.7\columnwidth]{/Users/josemawyin/Downloads/ShellMethodCalculus-7-10.png}
+
+
+\includegraphics[width=0.7\columnwidth]{/Users/josemawyin/Downloads/ShellMethodCalculus-7-10-Graph.jpeg}
+
+```{r}
+F = antiD(2*pi*(y^2)/5 ~ y)
+F
+Answer7.10 = (F(y = 10) - F(y = 5)) 
+cat("The volume of the revolved solid is",Answer7.10 %>% round(2), "units.") 
+```
+
+
+
+
+
+
+
+
+
+
+
