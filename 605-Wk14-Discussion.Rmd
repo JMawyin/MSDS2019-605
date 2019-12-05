@@ -1,0 +1,57 @@
+---
+title: "605-Wk14-Discussion"
+author: "Jose Mawyin"
+date: "12/4/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rSymPy)
+```
+
+## 605-Wk14-Discussion
+
+
+$$\text { 26. } f(x)=e^{-x}$$
+
+
+
+```{r,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+for (n in 1:10) {
+sympy("var('p')")
+sympy("var('x')") 
+equation <- paste("p=series(exp(-x), x, 0,", n,")") 
+xt <- sympy(equation) 
+xt0 <- sympy("p.removeO()")
+
+x <- 1/4
+T1 <- eval(parse(text=xt0))
+T2 <- exp(-x)               
+Difference <- (T1-T2)
+cat("\nAt", n," terms, The Taylor expansion is",xt0 ,". \n Evaulating at ",x,", the difference between the Taylor expansion and the built-in function is\n", Difference,"\n")
+rm(x)
+}
+```
+
+$$\text { 29. } f(x)=e^{x} \sin x \quad \text { (only find the first } 4 \text { terms) }$$
+
+
+
+
+```{r,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+for (n in 1:4) {
+sympy("var('p')")
+sympy("var('x')") 
+equation <- paste("p=series(exp(x)*sin(x), x, 0,", n,")") 
+xt <- sympy(equation) 
+xt0 <- sympy("p.removeO()")
+
+x <- 1/4
+T1 <- eval(parse(text=xt0)) 
+T2 <- exp(x)*sin(x)              
+Difference <- (T1-T2)
+cat("\nAt", n," terms, The Taylor expansion is",xt0 ,". \n Evaulating at ",x,", the difference between the Taylor expansion and the built-in function is\n", Difference,"\n")
+rm(x)
+}
+```
