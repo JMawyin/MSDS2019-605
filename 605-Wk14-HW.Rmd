@@ -1,0 +1,99 @@
+---
+title: "605-Wk14-HW"
+author: "Jose Mawyin"
+date: "12/3/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Ryacas)
+library(tictoc)
+library(mosaicCalc)
+library(rSymPy)
+library(NLP)
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+## Taylor Functions
+
+| Function and Series   | First Few Terms   | Interval of Convergence   |
+|--------------------------------------|--------------------------|------------------|
+|   $\ln (1+x)=\sum_{n=1}^{\infty}(-1)^{(n-1)} \frac{x^{2 n-1}}{(2 n-1) !}$  |  $x-\frac{x^{2}}{2}+\frac{x^{3}}{3}-\frac{x^{4}}{4}+\frac{x^{5}}{5}-\dots$  |    $(-1,1]$   |
+|  $e^{x}=\sum_{n=0}^{\infty} \frac{x^{n}}{n !}$  |  $1+x+\frac{x^{2}}{2 !}+\frac{x^{3}}{3 !}+\cdots$ |   $(-\infty, \infty)$   |
+|    $\frac{1}{1-x}=\sum_{n=0}^{\infty} x^{n}$  |    $1+x+x^{2}+x^{3}+\cdots$ |     $(-1,1)$   |
+
+
+For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion. Please submit your assignment as a R-Markdown document.
+
+We can use the library *rSymPy* to symbolically calculate the Taylor expansio of the series above. Below we compare how closely the Taylor expansion value compares to the numerical value evaluated at 0.8
+
+$$\frac{1}{1-x}$$
+
+```{r,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+for (n in 1:10) {
+sympy("var('p')")
+sympy("var('x')") # or sympy("x = Symbol('x', real=True)")
+equation <- paste("p=series(1/(1-x), x, 0,", n,")") #"p=series(1/(1-x), x, 0, 10)"
+xt <- sympy(equation) # expand about 0 to 10th order
+#xt <- sympy("p=series(1/(1-x), x, 0, 10)") # expand about 0 to 10th order
+# Remove order information
+xt0 <- sympy("p.removeO()")
+# Test results
+x <- 1/3
+T1 <- eval(parse(text=xt0)) # Evaluate the result, xt0
+T2 <- 1/(1-x)                # The correct value
+Difference <- (T1-T2)
+cat("\nAt", n," terms, The Taylor expansion is",xt0 ,". \n Evaulating at 0, the difference between the Taylor expansion and the built-in function is\n", Difference,"\n")
+rm(x)
+}
+```
+
+\pagebreak
+
+$$e^{x}$$
+```{r,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+for (n in 1:10) {
+sympy("var('p')")
+sympy("var('x')") # or sympy("x = Symbol('x', real=True)")
+equation <- paste("p=series(exp(x), x, 0,", n,")") #"p=series(1/(1-x), x, 0, 10)"
+xt <- sympy(equation) # expand about 0 to 10th order
+#xt <- sympy("p=series(1/(1-x), x, 0, 10)") # expand about 0 to 10th order
+# Remove order information
+xt0 <- sympy("p.removeO()")
+# Test results
+x <- 0.8
+T1 <- eval(parse(text=xt0)) # Evaluate the result, xt0
+T2 <- exp(x)                # The correct value
+Difference <- (T1-T2)
+cat("\nAt", n," terms, The Taylor expansion is",xt0 ,". \n Evaulating at 0.8, the difference between the Taylor expansion and the built-in function is\n", Difference,"\n")
+rm(x)
+}
+```
+
+\pagebreak
+
+$$\ln (1+x)$$
+
+```{r,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+for (n in 1:10) {
+sympy("var('p')")
+sympy("var('x')") # or sympy("x = Symbol('x', real=True)")
+equation <- paste("p=series(log(1+x), x, 0,", n,")") #"p=series(1/(1-x), x, 0, 10)"
+xt <- sympy(equation) # expand about 0 to 10th order
+#xt <- sympy("p=series(1/(1-x), x, 0, 10)") # expand about 0 to 10th order
+# Remove order information
+xt0 <- sympy("p.removeO()")
+# Test results
+x <- 0.8
+T1 <- eval(parse(text=xt0)) # Evaluate the result, xt0
+T2 <- log(1+x)                # The correct value
+Difference <- (T1-T2)
+cat("\nAt", n," terms, The Taylor expansion is",xt0 ,". \n Evaulating at 0.8, the difference between the Taylor expansion and the built-in function is\n", Difference,"\n")
+rm(x)
+}
+```
+
+
+
