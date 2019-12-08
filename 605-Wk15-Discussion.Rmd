@@ -1,0 +1,79 @@
+---
+title: "605-Wk15-Discussion"
+author: "Jose Mawyin"
+date: "12/8/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rSymPy)
+```
+
+## Solution of Partial Derivatives using rSympy
+
+For the the following equations:
+
+
+$$\text { Find } f_{x}, f_{y}, f_{x x}, f_{y y}, f_{x y} \text { and } f_{y x}$$
+
+### Exercise 9
+
+$$ \text { 9. } f(x, y)=x^{2} y+3 x^{2}+4 y-5$$
+
+
+```{r, echo=FALSE}
+print("Given the variables:")
+sympy("var('x')")
+sympy("var('y')")
+
+print("fx:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, x)")
+
+print("fy:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, y)")
+
+print("fxx:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, x, x)")
+
+print("fyy:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, y, y)")
+
+print("fxy:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, x, y)")
+
+print("fyx:")
+sympy("diff(y*x**2 + 3*x**2 + 4*y - 5, y, x)")
+```
+
+
+
+### Exercise 10
+
+$$ \text { 13. } f(x, y)=e^{x^{2}+y^{2}}$$
+
+
+```{r, echo=FALSE}
+print("Given the variables:")
+sympy("var('x')")
+sympy("var('y')")
+
+print("fx:")
+sympy("diff(exp((x**2)+(y**2)), x)")
+
+print("fy:")
+sympy("diff(exp((x**2)+(y**2)), y)")
+
+print("fxx:")
+sympy("diff(exp((x**2)+(y**2)), x, x)")
+
+print("fyy:")
+sympy("diff(exp((x**2)+(y**2)), y, y)")
+
+print("fxy:")
+sympy("diff(exp((x**2)+(y**2)), x, y)")
+
+print("fyx:")
+sympy("diff(exp((x**2)+(y**2)), y, x)")
+```
+
