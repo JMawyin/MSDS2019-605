@@ -1,0 +1,127 @@
+---
+title: "605-Wk15-HW"
+author: "Jose Mawyin"
+date: "12/8/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rSymPy)
+library(ggplot2)
+library(reticulate)
+```
+
+## R Markdown
+
+1. Find the equation of the regression line for the given points. Round any final values to the nearest hundredth, if necessary. (5.6,8.8), (6.3,12.4), (7,14.8), (7.7,18.2), (8.4,20.8)
+
+```{r}
+x.data <- c(5.6,6.3,7,7.7,8.4)
+y.data <- c(8.8,12.4,14.8, 18.2, 20.8)
+my.data <- data.frame( y.data, x.data)
+```
+
+```{r}
+linear.fit <- lm(my.data)
+summary(linear.fit)
+```
+
+The equation of the regresion line is: y = -15.0667 + 4.2857*x
+
+Below we see a Scatter Plot of the 3 sets of datapoints with a Fit line created using the parameters from the linear regression.
+
+```{r}
+p <- ggplot(my.data, aes(x.data, y.data)) + geom_point() 
+
+
+fun.1 <- function(x) -15.0667 + 4.2857*x
+
+
+p + stat_function(fun = fun.1) 
+```
+
+
+
+
+\pagebreak
+
+2. Find all local maxima, local minima, and saddle points for the function given below. Write your answer(s) in the form ( x, y, z ). Separate multiple points with a comma.
+
+$$f(x, y)=24 x-6 x y^{2}-8 y^{3}$$
+```{r}
+print("Given the variables:")
+sympy("var('x')")
+sympy("var('y')")
+
+print("fx:")
+fx <- sympy("latex(diff(24*x - 6*x*y**2 - 8*y**3, x))")
+
+print("fy:")
+fy <-sympy("latex(diff(24*x - 6*x*y**2 - 8*y**3, y))")
+```
+
+The partials derivatives are:
+
+fx = `r fx`
+
+fy = `r fy`
+
+$$\begin{array}{c}{y=\sqrt{\frac{24}{6}}=\pm 2} \\ {x=-2 y=\mp 4}\end{array}$$
+The critical points are: (-4,+2) ; (+4,-2)
+
+\pagebreak
+
+
+3. A grocery store sells two brands of a product, the "house" brand and a "name" brand. The manager estimates that if she sells the "house" brand for x dollars and the "name" brand for y dollars, she will be able to sell $81-21 x+17 y$ units of the "house" brand and $40+11 x-23 y$ units of the "name" brand.
+Step 1. Find the revenue function R ( x, y ).
+
+
+R(House Brand) = x*(81-21*x+17*y)
+R(Name Brande) = y*(40+11*x-23*y)
+R(Total) = x*(81-21*x+17*y) + y*(40+11*x-23*y)
+
+Step 2. What is the revenue if she sells the "house" brand for $2.30 and the "name" brand for $4.10?
+
+Solve R(total) when x = 2.30 and y = 4.10
+
+R(total) = 116.62
+
+\pagebreak
+
+4. A company has a plant in Los Angeles and a plant in Denver. The firm is committed to produce a total of 96 units of a
+product each week. The total weekly cost is given by $C(x, y)=\frac{1}{6} x^{2}+\frac{1}{6} y^{2}+7 x+25 y+700$, where x is the number of
+units produced in Los Angeles and y is the number of units produced in Denver. How many units should be produced in each plant to minimize the total weekly cost?
+
+>Since the total number of produced units is 96, we can express x in terms of y:
+
+>x = 96 - y
+
+$$\frac{\partial}{\partial x}\left(\frac{1}{6} x^{2}+\frac{1}{6}(96-x)^{2}+7 x+25(96-x)+700\right)$$
+
+And we can find the first derivative to find the minimum of this equation:
+
+$$2 \times \frac{x}{6}+\frac{1}{6}(-2 \times 96)+2 \times \frac{x}{6}+7-25$$
+
+Gathering terms:
+
+$$\frac{2 x}{3}-50$$
+
+with a root of x = 75
+ and a y value of y = 21
+
+To minimize production cost, the company should produce 75 units in Los Angeles and 21 in Denver.
+
+\pagebreak
+
+5. Evaluate the double integral on the given region.
+
+$$\iint_{R}\left(e^{8 x+3 y}\right) d A ; R: 2 \leq x \leq 4 \text { and } 2 \leq y \leq 4$$
+```{r}
+sympy("var('x')")
+sympy("var('y')")
+Sol.5 <- sympy("latex(integrate(exp(8*x+3*y), (x, 2, 4), (y, 2, 4)))")
+```
+
+
+Write your answer in exact form without decimals: `r Sol.5`
