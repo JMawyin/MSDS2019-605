@@ -1,0 +1,382 @@
+---
+title: "605 Final"
+author: "Jose Mawyin"
+date: "12/14/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(fig.width=12, fig.height=6)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+library(magrittr)
+library(tidyverse)
+library(ggiraphExtra)
+library(ggplot2)
+library(ggExtra)
+library(Hmisc)
+library(corrplot)
+library(Matrix)
+library(dplyr)
+library(psych)
+```
+
+
+## Final:  605 - Computational Mathematics
+
+
+### Problem 1.
+>Using R, generate a random variable X that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6.  Then generate a random variable Y that has 10,000 random normal numbers with a mean of $\mu=\sigma=(N+1) / 2$.  
+
+>Probability.   Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the median of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable.  Interpret the meaning of all probabilities.
+
+
+
+
+
+```{r, echo=FALSE}
+set.seed(42)
+Probability <- data.frame(data.frame(matrix(NA, nrow = 10000, ncol = 1)))
+Probability$X <- runif(nrow(Probability), 1, 6)
+A <- 10000
+B <- 1
+N <- 6
+mean <- (N+1)/2
+sd <- sd(Probability$X)
+Y <- matrix( rnorm(A*B,mean,sd=1), A, B) 
+Probability <- cbind(Probability,Y)
+str(Probability)
+x <- median(Probability$X) %>% as.integer()
+y <- quantile(Probability$Y, 0.25, names = FALSE) 
+
+cat("The mean of Y is", mean(Probability$Y), "\nThe median of X or x is", x, "\nThe 1st quartile of the Y or y is", y)
+
+```
+
+
+
+
+
+
+
+
+**5 points**
+
+a and c are examples of Conditional Probability where:
+
+Conditional Probability: $P(A | B)=\frac{P(A) P(B | A)}{P(B)}$
+
+b is an example of Joint Probability where:
+
+Joint Probability: $P(A, B)=P(B) P(A | B)$
+
+
+
+$\text { a. } P(X>x | X>y)$
+
+```{r, echo=FALSE}
+X <- Probability$X
+Prob.a <- Probability %>%
+  filter(X > y) %>%
+  summarise(prob = mean(X > x , na.rm = T))
+cat("The probability of a is:", Prob.a[1,1] )
+```
+$\text { b. } P(X>x, Y>y)$
+
+```{r, echo=FALSE}
+denominator <- nrow(Probability)
+P <- Probability %>%
+  filter(X > x) %>% nrow()
+Q <- Probability %>%
+  filter(Y > y) %>% nrow()
+Prob.b <- (P / denominator) * (Q / denominator) 
+cat("The probability of b is:", Prob.b)
+
+```
+
+$\text { c. } P(X<x | X>y)$
+
+```{r, echo=FALSE}
+Prob.c <- Probability %>%
+  filter(X > y) %>% 
+  summarise(prob = mean(X < x , na.rm = T))
+cat("The probability of c is:", Prob.c[1,1] )
+```
+
+\pagebreak
+
+**5 points.**   Investigate whether $\mathrm{P}(\mathrm{X}>\mathrm{x} \text { and } \mathrm{Y}>\mathrm{y})=\mathrm{P}(\mathrm{X}>\mathrm{x}) \mathrm{P}(\mathrm{Y}>\mathrm{y})$ by building a table and evaluating the marginal and joint probabilities.
+
+A = $\mathrm{P}(\mathrm{X}>\mathrm{x} \text { and } \mathrm{Y}>\mathrm{y})$
+
+B = $\mathrm{P}(\mathrm{X}>\mathrm{x}) \mathrm{P}(\mathrm{Y}>\mathrm{y})$
+
+>Let's create a contingency table:
+
+```{r, echo=FALSE}
+A1 <- Probability %>%filter(X < x) %>% nrow()
+A2 <- Probability %>%filter(X > x) %>% nrow()
+A3 <- Probability %>%filter(X == x) %>% nrow()
+B1 <- Probability %>%filter(Y < y) %>% nrow()
+B2 <- Probability %>%filter(Y > y) %>% nrow()
+
+
+A1B1 <-Probability %>%filter(Y < y) %>% summarise(prob = sum(X < x , na.rm = T))
+A1B2 <-Probability %>%filter(Y > y) %>% summarise(prob = sum(X < x , na.rm = T))
+A2B1 <-Probability %>%filter(Y < y) %>% summarise(prob = sum(X > x , na.rm = T))
+A2B2 <-Probability %>%filter(Y > y) %>% summarise(prob = sum(X > x , na.rm = T))
+
+
+
+observed_table <- matrix(c(A1B1,A1B2 ,A1B1+A1B2 ,A2B1,A2B2,A2B1+A2B2,A1B1+ A2B1,A1B2+A2B2,A1B1+A1B2+ A2B1+A2B2), nrow = 3, ncol = 3, byrow = T)
+rownames(observed_table) <- c('X < x', 'X > x', 'total')
+colnames(observed_table) <- c('Y < y ', 'Y > y', 'total')
+observed_table2 <- matrix(c(A1B1,A1B2 ,A2B1,A2B2), nrow = 2, ncol = 2, byrow = T) %>% data.frame()
+observed_table
+
+
+```
+
+>Let's see if A = B
+
+```{r, echo=FALSE}
+cat("The probability of A is:", 4482/10000,"\nThe probability of B is:", Prob.b)
+```
+
+>Therefore A is not equal to B
+
+####5 points.  Check to see if independence holds by using Fisher’s Exact Test and the Chi Square Test.  What is the difference between the two? Which is most appropriate?
+
+Let's see if there is independency between the generated X and Y values using:
+
+**Pearson's Chi-squared test**
+
+```{r, echo=FALSE}
+datatable <- matrix(c(989,3018,1511,4482),nrow=2,ncol=2) 
+chisq.test(datatable)
+
+```
+
+**Fisher's Exact Test**
+
+```{r, echo=FALSE}
+fisher.test(datatable)
+```
+
+$\begin{array}{c}{\mathrm{H}_{\mathrm{O}}: \text { Variable } \mathrm{A} \text { and Variable } \mathrm{B} \text { are independent. }} \\ {\mathrm{H}_{\mathrm{a}}: \text { Variable } \mathrm{A} \text { and Variable } \mathrm{B} \text { are not independent. }}\end{array}$
+
+>For both test we find that the p-value is close to 0.5 that is a lot larger than typical tresholds of 0.05 or 0.1, we cannot accept the null hypothesis. Thus, we conclude that there is a relationship between the two generated variables X and Y.
+
+>Both test are appropiate in the case of our small sized contingency table. Fisher's Test performs worse with large datasets. Not in this case.
+
+
+\pagebreak
+
+###Problem 2
+
+>You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition.  https://www.kaggle.com/c/house-prices-advanced-regression-techniques .  I want you to do the following.
+
+####5 points.  Descriptive and Inferential Statistics. Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
+
+>First, let's see the structure and statistics summary of our dataset:
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#house_train <- read_csv("/Users/josemawyin/Downloads/Datasets/house-prices-kaggle/train.csv")
+house_train <- read.csv(file="/Users/josemawyin/Downloads/Datasets/house-prices-kaggle/train.csv", stringsAsFactors = TRUE)
+house_test <- read.csv(file="/Users/josemawyin/Downloads/Datasets/house-prices-kaggle/test.csv", stringsAsFactors = TRUE)
+
+str(house_train)
+```
+
+```{r}
+describe(house_train)
+```
+
+Is is a dataset with a large number of explanatory variables (80) that are provided to find their relevance in in the response variable - SalePrice of a house.
+
+>Let's see how some explanatory variables (LotArea,YearBuilt,OverallQual,PoolArea) relate to SalePrice
+
+```{r, warning=FALSE, error=FALSE, message=FALSE, echo=FALSE}
+house_train %>%
+  gather(LotArea,YearBuilt,OverallQual,PoolArea, key = "var", value = "value") %>% 
+  ggplot(aes(x = value, y = SalePrice)) +
+    geom_point() +
+    facet_wrap(~ var, scales = "free", ncol = 1) +
+    theme_bw()
+```
+
+>Some explanatory variables are discrete whole others are continous.
+
+>Let's study the correlation matrix between "SalePrice","OverallQual" and "Fireplaces"
+
+```{r, warning=FALSE, error=FALSE, message=FALSE, echo=FALSE}
+my_data <- house_train[, c("SalePrice","LotArea","YearBuilt","OverallQual","PoolArea")]
+# print the first 6 rows
+res <- cor(my_data)
+corr.matrix <- round(res, 2)
+#corrplot(res, method = "number")
+corrplot(res ,method="circle") 
+```
+
+>Some of explanatory variables have more statistical significance than others in explaining the response variable.
+
+
+
+
+
+\pagebreak
+
+####5 points. Linear Algebra and Correlation.  Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
+
+>To find inverse of correlation matrix
+
+```{r}
+rownames(corr.matrix) <- c()
+colnames(corr.matrix) <- c()
+precision.matrix <- solve(corr.matrix)
+precision.matrix
+```
+
+>Multiply the correlation matrix by the precision matrix
+
+```{r}
+C.product.P <- corr.matrix %*% precision.matrix
+C.product.P
+```
+
+>LU decomposition
+
+```{r}
+LU <- expand(lu(C.product.P))
+LU
+```
+
+```{r}
+L.times.U <-LU[["L"]] %*% LU[["U"]] %>% as.matrix()
+L.times.U
+```
+
+```{r}
+C.product.P
+```
+
+>Multiplying the two component matrices of the LU decomposition we get our initial matrix back.
+
+\pagebreak
+
+####10 points.  Modeling.  Build some type of multiple regression  model and submit your model to the competition board.  Provide your complete model summary and results with analysis.  Report your Kaggle.com user name and score.
+
+>First, let's create a dataframe containing only non-factor variables and use these to create a linear regression model with SalePrice as the response variable.
+
+```{r, echo=FALSE}
+non_factor_train <- house_train[, sapply(house_train, class) != "factor"] #Removing Factos from Data Frame
+non_factor_test <- house_train[, sapply(house_test, class) != "factor"] 
+mylm<-lm(SalePrice~., data=non_factor_train) #build regression
+mysummary <-summary(mylm) #summarize
+mysummary
+```
+
+>Our R-squared value using `r ncol(non_factor_test) - 1` explanatory varialbles is `r mysummary$r.squared`. Can we do better?
+
+>Let's remove those columns with the lowest statistical signifance in explaining our response variable.
+
+```{r, echo=FALSE}
+require(dplyr)
+non_factor_train2 <- non_factor_train %>% select(-Id, -LotFrontage, -YearRemodAdd, -BsmtFinSF2, -TotalBsmtSF, -BsmtHalfBath, -FullBath, -HalfBath, -GarageYrBlt, -GarageArea, -OpenPorchSF, -EnclosedPorch, -X3SsnPorch, -X3SsnPorch, -MiscVal, -MoSold, -YrSold, -MasVnrArea, -GrLivArea, -LowQualFinSF, -Fireplaces, -PoolArea)
+
+```
+
+>And let's run a new linear model.
+
+```{r}
+mylm<-lm(SalePrice~., data=non_factor_train2) #build regression
+mysummary <-summary(mylm) #summarize
+mysummary
+```
+
+>Our new R-squared value using `r ncol(non_factor_train2) - 1` explanatory varialbles is `r mysummary$r.squared`. Not an improvement, but also we have not reduce the fitness of our model by using half the initial number of explanatory variables.
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+library(dplyr)
+for (i in 1:17){
+  absmin=abs(min(non_factor_train2[,i]))+.01 # we are leaking only two values, min & max
+  non_factor_train2[,i]=non_factor_train2[,i]+absmin
+}
+
+
+```
+
+>Finally, let's see if our response variables have an exponential component. Bellow, is the list of calculated exponents for the variables we selected in our reduced_variable model.
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+library(car)
+myt=powerTransform(as.matrix(non_factor_train2[,1:17])~1)  #fit all quant to identity
+print(myt$lambda) #print the labmdas
+```
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+for (i in 1:14){
+  non_factor_train2[,i]=non_factor_train2[,i]^myt$lambda[i]#use lambdas
+
+  }
+train_power=as.data.frame(non_factor_train2) #make into a data frame
+
+```
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+mylm <-lm(SalePrice~., data=train_power)
+mysummary=summary(mylm) #summarize
+mysummary
+```
+>Our new R-squared value using exponential factors with our `r ncol(non_factor_train2) - 1` explanatory varialbles is `r mysummary$r.squared`. Our R-squared value went down! Not an improvement.
+
+\pagebreak
+
+####5 points.  Calculus-Based Probability & Statistics.  Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run fitdistr to fit an exponential probability density function.  (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, $\lambda$)).  Plot a histogram and compare it with a histogram of your original variable.   Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).   Also generate a 95% confidence interval from the empirical data, assuming normality.  Finally, provide the empirical 5th percentile and 95th percentile of the data.  Discuss.
+
+>First, let's shift the minimum of the Lot Area by 1300 to it starts at zero. Below is the summary of the distributions.
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+summary(house_train$LotArea)
+house_train$LotArea2 <- house_train$LotArea-1300
+summary(house_train$LotArea2)
+```
+
+>Then we will calculate an exponential fit and the optimal lambda value.
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+library(MASS)
+fit1 <- fitdistr(house_train$LotArea2, "exponential")
+fit1
+
+ks.test(house_train$LotArea2, "pexp", fit1$estimate)
+```
+>Where lambda was found to be: `r fit1$estimate`
+
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+set.seed(2)
+lambda <- fit1[["estimate"]][["rate"]]
+test.exp.dist <- rexp(1460, lambda) %>% as.data.frame()
+```
+
+>Finally, let's compare both calculated exponential and original distributions from our data.
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+
+ggplot() + 
+  geom_histogram(aes(x=house_train$LotArea2),fill="red",binwidth = 2000, alpha=0.5, position="identity") + 
+  geom_histogram(aes(x=test.exp.dist$.),binwidth = 2000,fill="blue", alpha=0.5, position="identity")+ xlim(0, 50000)+ labs(title = "Histogram of House Lot Area - From Dataset (Red) and Sample Distribution (Blue)",
+       x = "House Lot Area", y = "Count")
+```
+
+>Our dataset and calculated exponentail distribution do not look anything like. The exponential fit to the our data does not make sense even if our data shows signficant skewness (right skew).
+
+```{r}
+hist(house_train$LotArea2, col = 'skyblue3', breaks = 40,xlim=c(0,50000))
+```
+
